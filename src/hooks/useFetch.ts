@@ -1,7 +1,7 @@
 import axios from "axios";
 import { useState } from "react";
 
-export default <T>() => {
+export default <T extends { meals?: any[]} >() => {
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState<T>();
 
@@ -9,7 +9,13 @@ export default <T>() => {
     setLoading(true);
     axios
       .get<T>(url)
-      .then(({ data }) => setData(data.meals[0]))
+      .then(({ data }) => {
+        if (data.meals && data.meals.length > 0) {
+          setData(data.meals[0]);
+        } else {
+          console.error("No meals found in the response.");
+        }
+      })
       .finally(()=>setLoading(false));
   };
   return { loading, data, fetch };
